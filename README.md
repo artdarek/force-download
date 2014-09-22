@@ -18,7 +18,7 @@ Add artdarek/force-download to your composer.json file:
   "artdarek/force-download": "dev-master"
 }
 ```
-
+ 
 Use [composer](http://getcomposer.org) to install this package.
 
 ```
