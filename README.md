@@ -58,4 +58,4 @@ downloding specified file instead of opening it in the browser.
   <a href="download.php?dir=download_folder&file=example.pdf">Download</a>
 ```
 
-See ``examples`` directory for more examples :D
+See ``examples`` directory for more usage examples :D
