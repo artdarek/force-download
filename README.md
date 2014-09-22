@@ -31,8 +31,8 @@ Create file called ie. 'download.php' containing code below:
 
 ```php
 <?php
-    // include library
-    require '../vendor/autoload.php';
+    // include composer autoloader 
+    require 'vendor/autoload.php';
 
     // initialize download
     $force = new Artdarek\ForceDownload();
