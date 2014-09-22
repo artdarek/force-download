@@ -7,6 +7,8 @@
 
 namespace Artdarek;
 
+use Exception;
+
 class ForceDownload {
 
     /**
