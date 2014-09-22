@@ -1,0 +1,1 @@
+<a href="download.php?dir=download_folder&file=example.pdf">Download</a>
