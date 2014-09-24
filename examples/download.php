@@ -1,11 +1,10 @@
 <?php
 
     // include library
-    require '../vendor/autoload.php';
+    require '../src/Artdarek/ForceDownload.php';
 
     // initialize download
     $force = new Artdarek\ForceDownload();
     $force->download();
-
 
 ?>
