@@ -51,6 +51,30 @@ after this simply add:
   $force->download();
 ```
 
+you can also pass your own config to allow only some file types to be downloadable:
+
+```php
+	// custom config
+	$config = array(
+    'allowed_extensions' => array(
+      // archives
+          'zip' => 'application/zip',
+      // documents
+          'pdf' => 'application/pdf',
+      // images
+          'gif' => 'image/gif',
+          'png' => 'image/png',
+          'jpg' => 'image/jpeg',
+          'jpeg'=> 'image/jpeg',
+    )
+	);
+
+  // initialize download
+  $force = new Artdarek\ForceDownload($config);
+  $force->download();
+```
+
+
 Done... now you can create a url that will directly start
 downloding specified file instead of opening it in the browser.
 
