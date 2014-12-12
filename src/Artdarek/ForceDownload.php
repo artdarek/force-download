@@ -34,9 +34,7 @@ class ForceDownload {
      * @var array
      */
     private $_config = array(
-        'allowed_referrer'   => '',
-        'log_downloads'      => false,
-        'log_file'           => 'downloads.log',
+        'allowed_referer'   => '',
         'allowed_extensions' => array(
                                 // archives
                                     'zip' => 'application/zip',
@@ -121,13 +119,9 @@ class ForceDownload {
     public function download()
     {
 
-        // If hotlinking not allowed then make hackers think there are some server problems
-        if ($this->_config['allowed_referrer'] !== ''
-            && (!isset($_SERVER['HTTP_REFERER']) || strpos(strtoupper($_SERVER['HTTP_REFERER']),strtoupper(ALLOWED_REFERRER)) === false)
-        ) {
-            throw new Exception('Internal server error. Please contact system administrator.');
-        }
-
+        // check if refferer is allowed
+        $this->isRefererAllowed( $this->_config['allowed_referer'] );
+        
         // Make sure program execution doesn't time out
         // Set maximum script execution time in seconds (0 means no limit)
         set_time_limit(0);
@@ -138,33 +132,46 @@ class ForceDownload {
         }
 
         // Get real file name (Remove any path info to avoid hacking by adding relative path, etc.)
-        $file_name = basename($this->_file);
-        // get full file path (including subfolders)
-        $file_path = $this->getFullFilePath($file_name);
-        // file size in bytes
-        $file_size = filesize($file_path);
-        // file extension
-        $file_extension = $this->getFileExtension( $file_name );
+        $file = $this=getFileInfo($this->_file);
 
         // check if file extension is allowed
-        $this->isFileExtensionAllowed( $file_extension );
-
-        // get file mimetype
-        $file_mime = $this->getMimeType( $file_path, $fext );
+        $this->isFileExtensionAllowed( $file['extension'] );
+        
         // name for a downloaded file
-        $asname = $this->saveAs( $this->_as );
+        $new_file_name = $this->saveAs( $this->_as );
 
         // set headers
         $this->setheaders(array(
-                'mtype' => $file_mime,
-                'filename' => $asname,
-                'file_size' => $file_size
+                'mime_type' => $file['mime'],
+                'file_name' => $new_file_name,
+                'file_size' => $file['size']
             )
         );
 
         // get file content from source file
-        $this->getFileContent($file_path);
+        $this->getFileContent($file['path']);
     }
+
+     /**
+     * Get file info
+     * @param string $file
+     * @return array
+     */
+    public function getFileInfo($file)
+    {
+        // Get real file name (Remove any path info to avoid hacking by adding relative path, etc.)
+        $file['name'] = basename($file);
+        // get full file path (including subfolders)
+        $file['path'] = $this->getFullFilePath($file_name);
+        // file size in bytes
+        $file['size'] = filesize($file_path);
+        // file extension
+        $file['extension'] = $this->getFileExtension( $file_name );    
+        // get file mimetype
+        $file['mime'] = $this->getMimeType( $file['path'], $file['extension'] );
+
+        return $file;
+    }   
 
     /**
      * Get file content from source file
@@ -219,8 +226,8 @@ class ForceDownload {
         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
         header('Cache-Control: public');
         header('Content-Description: File Transfer');
-        header('Content-Type: '.$attribs['mtype']);
-        header('Content-Disposition: attachment; filename="'.$attribs['filename'].'"');
+        header('Content-Type: '.$attribs['mime_type']);
+        header('Content-Disposition: attachment; filename="'.$attribs['file_name'].'"');
         header('Content-Transfer-Encoding: binary');
         header('Content-Length: '. $attribs['file_size']);
     }
@@ -228,20 +235,20 @@ class ForceDownload {
     /**
      * Set target name for downloading file
      * @param  string $filename
-     * @return string $asfname
+     * @return string $new_file_name
      */
     public function saveAs($filename = null) {
         // Browser will try to save file with this filename, regardless original filename.
         // You can override it if needed.
         if (!isset($filename) || empty($filename)) {
-          $asfname = $this->_file;
+          $new_file_name = $this->_file;
         }
         else {
           // remove some bad chars
-          $asfname = str_replace(array('"',"'",'\\','/'), '', $filename);
-          if ($asfname === '') $asfname = 'NoName';
+          $new_file_name = str_replace(array('"',"'",'\\','/'), '', $filename);
+          if ($new_file_name === '') $new_file_name = 'NoName';
         }
-        return $asfname;
+        return $new_file_name;
     }
 
     /**
@@ -264,6 +271,22 @@ class ForceDownload {
     {
         if (!array_key_exists($extension, $this->_config['allowed_extensions'])) {
             throw new Exception('"Not allowed file type.');
+        }
+    }
+
+
+    /**
+     * Check if refferer is allowed
+     * @param  string  $referrer
+     * @return boolean
+     */
+    public function isRefererAllowed( $referer )
+    {
+        // If hotlinking not allowed then make hackers think there are some server problems
+        if ($referer !== ''
+            && (!isset($_SERVER['HTTP_REFERER']) || strpos(strtoupper($_SERVER['HTTP_REFERER']),strtoupper($referer)) === false)
+        ) {
+            throw new Exception('Internal server error. Please contact system administrator.');
         }
     }
 
