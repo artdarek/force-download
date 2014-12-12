@@ -132,7 +132,7 @@ class ForceDownload {
         }
 
         // Get real file name (Remove any path info to avoid hacking by adding relative path, etc.)
-        $file = $this=getFileInfo($this->_file);
+        $file = $this->getFileInfo($this->_file);
 
         // check if file extension is allowed
         $this->isFileExtensionAllowed( $file['extension'] );
@@ -154,19 +154,19 @@ class ForceDownload {
 
      /**
      * Get file info
-     * @param string $file
+     * @param string $filename
      * @return array
      */
-    public function getFileInfo($file)
+    public function getFileInfo($filename)
     {
         // Get real file name (Remove any path info to avoid hacking by adding relative path, etc.)
-        $file['name'] = basename($file);
+        $file['name'] = basename($filename);
         // get full file path (including subfolders)
-        $file['path'] = $this->getFullFilePath($file_name);
+        $file['path'] = $this->getFullFilePath($file['name']);
         // file size in bytes
-        $file['size'] = filesize($file_path);
+        $file['size'] = filesize($file['path']);
         // file extension
-        $file['extension'] = $this->getFileExtension( $file_name );    
+        $file['extension'] = $this->getFileExtension( $file['name'] );    
         // get file mimetype
         $file['mime'] = $this->getMimeType( $file['path'], $file['extension'] );
 
